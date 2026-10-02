@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ms-MY">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BaKata+ | Permainan Gamifikasi Literasi Disleksia Bahasa Melayu Standard</title>
+
+    <!-- Google Fonts: Lexend (Designed for dyslexia reading proficiency) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti Library for Victory Rewards -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        dyslexic: ['Lexend', 'Comic Sans MS', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        pastelCream: '#FFFDE7',
+                        creamCard: '#FFFDE0',
+                        boldRed: '#FF5252',
+                        boldBlue: '#29B6F6',
+                        boldGreen: '#66BB6A',
+                        boldOrange: '#FFA726',
+                        boldPurple: '#AB47BC',
+                        boldYellow: '#FFEE58',
+                        darkText: '#1E293B',
+                    },
+                    boxShadow: {
+                        'dys-sm': '0 4px 0 #0F172A',
+                        'dys-md': '0 6px 0 #0F172A',
+                        'dys-lg': '0 9px 0 #0F172A',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: #FFFDE7;
+            color: #1E293B;
+            letter-spacing: 0.08em;
+            word-spacing: 0.18em;
+            line-height: 1.7;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn-dyslexia {
+            transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-dyslexia:active {
+            transform: translateY(4px) !important;
+            box-shadow: 0 2px 0 #0F172A !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF9C4;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFA726;
+            border-radius: 10px;
+            border: 2px solid #0F172A;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden font-dyslexic bg-pastelCream text-darkText">
+
+    <header class="bg-boldYellow border-b-4 border-slate-900 px-4 py-3 sticky top-0 z-40 shadow-md">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchModule(0)">
+                <div class="bg-boldRed text-white font-black text-2xl md:text-3xl px-4 py-1.5 rounded-2xl border-3 border-slate-900 shadow-dys-sm tracking-wider">
+                    BaKata+
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-extrabold text-slate-900 leading-tight">Literasi Disleksia</h1>
+                    <p class="text-xs font-bold text-slate-700 hidden sm:block">Bahasa Melayu Standard Malaysia (KSSR)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 md:gap-4">
+                <div class="flex items-center gap-2 bg-white border-3 border-slate-900 px-3 py-1.5 rounded-full shadow-dys-sm text-lg md:text-xl font-black">
+                    <span class="text-2xl animate-bounce">⭐</span>
+                    <span id="stars-display" class="text-boldRed">0</span>
+                </div>
+
+                <div id="medal-container" class="flex items-center gap-1.5 bg-white border-3 border-slate-900 px-3 py-1.5 rounded-full shadow-dys-sm font-black text-sm md:text-base cursor-pointer" onclick="openMedalModal()" title="Koleksi Pingat Anugerah">
+                    <span id="medal-icon" class="text-2xl">🥉</span>
+                    <span id="medal-label" class="hidden md:inline">Gangsa</span>
+                </div>
+
+                <button id="btn-audio-toggle" onclick="toggleGlobalAudio()" class="bg-boldBlue text-white p-2.5 rounded-2xl border-3 border-slate-900 shadow-dys-sm btn-dyslexia font-black" title="Hidup/Matikan Suara">
+                    🔊
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto w-full px-4 pt-4">
+        <div id="instruction-card" class="bg-white border-4 border-slate-900 rounded-3xl p-4 shadow-dys-md flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <button onclick="repeatInstruction()" class="bg-boldOrange hover:bg-amber-500 text-white text-2xl md:text-3xl p-3 rounded-2xl border-3 border-slate-900 shadow-dys-sm btn-dyslexia shrink-0" title="Ulang Arahan Suara Perempuan">
+                    🔊
+                </button>
+                <div id="instruction-text" class="text-lg md:text-2xl font-black text-slate-900">
+                    Selamat datang! Sila pilih modul permainan di bawah untuk bermula.
+                </div>
+            </div>
+            <button onclick="switchModule(0)" class="bg-gray-200 hover:bg-gray-300 text-slate-900 font-extrabold text-sm md:text-base px-3 py-2 rounded-2xl border-2 border-slate-900 shadow-dys-sm shrink-0 btn-dyslexia">
+                🏠 Menu
+            </button>
+        </div>
+    </div>
+
+    <main class="flex-grow max-w-5xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+        <div id="app-viewport" class="bg-creamCard border-4 border-slate-900 rounded-3xl p-5 md:p-8 shadow-dys-lg min-h-[480px] flex flex-col justify-between relative overflow-hidden">
+            <!-- Dynamic module contents -->
+        </div>
+    </main>
+
+    <div id="reward-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-dys-lg">
+            <div id="reward-icon" class="text-7xl mb-2 animate-pulse">🎉</div>
+            <h2 id="reward-title" class="text-3xl md:text-4xl font-black text-slate-900 mb-2">Pandainya!</h2>
+            <p id="reward-desc" class="text-xl font-bold text-slate-700 mb-6">Jawapan anda betul tepat!</p>
+            <button onclick="closeRewardModal()" class="w-full bg-boldGreen hover:bg-green-500 text-slate-900 font-black text-2xl py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                Teruskan 🚀
+            </button>
+        </div>
+    </div>
+
+    <div id="medal-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 max-w-lg w-full text-center shadow-dys-lg">
+            <h2 class="text-3xl font-black text-slate-900 mb-4">🏆 Koleksi Pingat Anugerah</h2>
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="p-4 border-3 border-slate-900 rounded-2xl bg-amber-50">
+                    <div class="text-4xl">🥉</div>
+                    <div class="font-black mt-1 text-sm">Gangsa</div>
+                    <div class="text-xs text-slate-600 font-bold">Mula Bermain</div>
+                </div>
+                <div id="medal-card-silver" class="p-4 border-3 border-slate-900 rounded-2xl opacity-40 bg-gray-100">
+                    <div class="text-4xl">🥈</div>
+                    <div class="font-black mt-1 text-sm">Perak</div>
+                    <div class="text-xs text-slate-600 font-bold">Capai 10 ⭐</div>
+                </div>
+                <div id="medal-card-gold" class="p-4 border-3 border-slate-900 rounded-2xl opacity-40 bg-gray-100">
+                    <div class="text-4xl">🥇</div>
+                    <div class="font-black mt-1 text-sm">Emas</div>
+                    <div class="text-xs text-slate-600 font-bold">Capai 20 ⭐</div>
+                </div>
+            </div>
+            <button onclick="closeMedalModal()" class="bg-boldBlue text-white font-black text-xl px-6 py-2.5 rounded-2xl border-3 border-slate-900 shadow-dys-sm btn-dyslexia">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t-3 border-slate-900 py-3 text-center font-extrabold text-sm text-slate-700">
+        BaKata+ &copy; Gamifikasi Literasi Disleksia Bahasa Melayu Standard Malaysia
+    </footer>
+
+    <script>
+        const gameState = {
+            stars: 0,
+            medal: 'Gangsa',
+            currentModule: 0,
+            audioMuted: false,
+            m3Index: 0,
+            m4Index: 0,
+            m5Index: 0,
+            m6Index: 0,
+            m7Index: 0
+        };
+
+        const targetLetterPairs = [
+            { l1: 'b', l2: 'd', desc: 'b perut di depan (kanan), d perut di belakang (kiri)' },
+            { l1: 'b', l2: 'p', desc: 'b tiang ke atas, p tiang ke bawah' },
+            { l1: 'p', l2: 'q', desc: 'p bulatan kiri, q bulatan kanan' },
+            { l1: 'd', l2: 'q', desc: 'd tiang tinggi atas, q tiang panjang bawah' },
+            { l1: 'm', l2: 'n', desc: 'm ada 3 kaki, n ada 2 kaki' },
+            { l1: 'u', l2: 'n', desc: 'u terbuka ke atas, n terbuka ke bawah' },
+            { l1: 'v', l2: 'w', desc: 'v ada 1 bucu, w ada 2 bucu tajam' },
+            { l1: 'f', l2: 't', desc: 'f lentuk ke kanan, t palang lurus' },
+            { l1: 'i', l2: 'j', desc: 'i lurus dengan titik, j cangkuk bawah' }
+        ];
+
+        const mindTest1Questions = [
+            { sound: 'b', answer: 'b', options: ['b', 'd', 'p'] },
+            { sound: 'd', answer: 'd', options: ['d', 'b', 'q'] },
+            { sound: 'p', answer: 'p', options: ['p', 'q', 'b'] },
+            { sound: 'm', answer: 'm', options: ['m', 'n', 'u'] },
+            { sound: 'u', answer: 'u', options: ['u', 'n', 'v'] },
+            { sound: 'f', answer: 'f', options: ['f', 't', 'i'] },
+            { sound: 'j', answer: 'j', options: ['j', 'i', 'l'] }
+        ];
+
+        const simpulanMasterData = [
+            {
+                phrase: "ada hati",
+                pola: "Pola V-KV / KV-KV",
+                syllables1: ["a", "da"],
+                syllables2: ["ha", "ti"],
+                word1: "ada",
+                word2: "hati",
+                meaning: "Mempunyai keinginan atau cita-cita untuk melakukan sesuatu.",
+                example: "Ali ada hati hendak menjadi juruterbang.",
+                emoji: "🌟"
+            },
+            {
+                phrase: "iri hati",
+                pola: "Pola V-KV / KV-KV",
+                syllables1: ["i", "ri"],
+                syllables2: ["ha", "ti"],
+                word1: "iri",
+                word2: "hati",
+                meaning: "Perasaan dengki atau cemburu akan kejayaan orang lain.",
+                example: "Kita tidak boleh iri hati dengan kejayaan kawan.",
+                emoji: "😒"
+            },
+            {
+                phrase: "baik hati",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["ba", "ik"],
+                syllables2: ["ha", "ti"],
+                word1: "baik",
+                word2: "hati",
+                meaning: "Suka menolong dan bersikap penyayang.",
+                example: "Mani seorang yang baik hati kerana suka membantu.",
+                emoji: "🤝"
+            },
+            {
+                phrase: "hati batu",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["ha", "ti"],
+                syllables2: ["ba", "tu"],
+                word1: "hati",
+                word2: "batu",
+                meaning: "Degil dan tidak mahu mendengar nasihat orang lain.",
+                example: "Sikap hati batu menyebabkan dia susah dinasihati.",
+                emoji: "🪨"
+            },
+            {
+                phrase: "buta hati",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["bu", "ta"],
+                syllables2: ["ha", "ti"],
+                word1: "buta",
+                word2: "hati",
+                meaning: "Tidak dapat menerima kebenaran atau pengajaran.",
+                example: "Orang yang buta hati tidak mahu mengaku kesilapan.",
+                emoji: "👁️‍🗨️"
+            },
+            {
+                phrase: "buah hati",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["bu", "ah"],
+                syllables2: ["ha", "ti"],
+                word1: "buah",
+                word2: "hati",
+                meaning: "Orang yang sangat dikasihi atau dicintai.",
+                example: "Adik bongsu merupakan buah hati ibu dan ayah.",
+                emoji: "❤️"
+            },
+            {
+                phrase: "kata hati",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["ka", "ta"],
+                syllables2: ["ha", "ti"],
+                word1: "kata",
+                word2: "hati",
+                meaning: "Perasaan atau naluri dalam diri seseorang.",
+                example: "Nizam mengikut kata hati untuk memilih hobi baharu.",
+                emoji: "💭"
+            },
+            {
+                phrase: "sagu hati",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["sa", "gu"],
+                syllables2: ["ha", "ti"],
+                word1: "sagu",
+                word2: "hati",
+                meaning: "Hadiah atau ganjaran penghargaan kecil.",
+                example: "Peserta kuiz mendapat hadiah sagu hati.",
+                emoji: "🎁"
+            },
+            {
+                phrase: "gaji buta",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["ga", "ji"],
+                syllables2: ["bu", "ta"],
+                word1: "gaji",
+                word2: "buta",
+                meaning: "Mendapat bayaran tanpa melakukan kerja.",
+                example: "Kita mestilah rajin bekerja dan tidak makan gaji buta.",
+                emoji: "💵"
+            },
+            {
+                phrase: "kaki lima",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["ka", "ki"],
+                syllables2: ["li", "ma"],
+                word1: "kaki",
+                word2: "lima",
+                meaning: "Laluan berbumbung di hadapan kedai.",
+                example: "Murid-murid berteduh di kaki lima semasa hujan.",
+                emoji: "🏙️"
+            },
+            {
+                phrase: "buku lima",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["bu", "ku"],
+                syllables2: ["li", "ma"],
+                word1: "buku",
+                word2: "lima",
+                meaning: "Penumbuk tangan.",
+                example: "Pahlawan itu mengepalkan buku limanya.",
+                emoji: "✊"
+            },
+            {
+                phrase: "cuci mata",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["cu", "ci"],
+                syllables2: ["ma", "ta"],
+                word1: "cuci",
+                word2: "mata",
+                meaning: "Berseronok melihat pemandangan indah.",
+                example: "Kami bersiarsiar di taman bunga untuk cuci mata.",
+                emoji: "👀"
+            },
+            {
+                phrase: "bawa tuah",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["ba", "wa"],
+                syllables2: ["tu", "ah"],
+                word1: "bawa",
+                word2: "tuah",
+                meaning: "Membawa kebaikan atau keberuntungan.",
+                example: "Kehadiran kucing comel itu dianggap bawa tuah.",
+                emoji: "🍀"
+            },
+            {
+                phrase: "kaki buku",
+                pola: "Pola KV-KV / KV-KV",
+                syllables1: ["ka", "ki"],
+                syllables2: ["bu", "ku"],
+                word1: "kaki",
+                word2: "buku",
+                meaning: "Orang yang sangat suka membaca buku.",
+                example: "Aina digelar kaki buku kerana selalu membaca.",
+                emoji: "📚"
+            },
+            {
+                phrase: "air muka",
+                pola: "Pola KV-KVK / KV-KV",
+                syllables1: ["a", "ir"],
+                syllables2: ["mu", "ka"],
+                word1: "air",
+                word2: "muka",
+                meaning: "Rupa paras atau ekspresi wajah seseorang.",
+                example: "Air muka guru gembira apabila muridnya berjaya.",
+                emoji: "😊"
+            },
+            {
+                phrase: "duit kopi",
+                pola: "Pola KV-VK / KV-KV",
+                syllables1: ["du", "it"],
+                syllables2: ["ko", "pi"],
+                word1: "duit",
+                word2: "kopi",
+                meaning: "Wang hiasan atau sagu hati kecil.",
+                example: "Pekerja yang jujur tidak menerima duit kopi.",
+                emoji: "☕"
+            }
+        ];
+
+        const soundCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSfx(type) {
+            if (gameState.audioMuted) return;
+            if (soundCtx.state === 'suspended') soundCtx.resume();
+
+            const osc = soundCtx.createOscillator();
+            const gain = soundCtx.createGain();
+            osc.connect(gain);
+            gain.connect(soundCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, soundCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(659.25, soundCtx.currentTime + 0.12);
+                osc.frequency.exponentialRampToValueAtTime(783.99, soundCtx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.3, soundCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, soundCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(soundCtx.currentTime + 0.4);
+            } else if (type === 'applause') {
+                // Bunyi Tepuk Tangan Simulasi (White Noise bursts & Chords)
+                playApplauseEffect();
+            } else if (type === 'wrong') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(240, soundCtx.currentTime);
+                osc.frequency.setValueAtTime(170, soundCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.3, soundCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, soundCtx.currentTime + 0.35);
+                osc.start();
+                osc.stop(soundCtx.currentTime + 0.35);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, soundCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, soundCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, soundCtx.currentTime + 0.08);
+                osc.start();
+                osc.stop(soundCtx.currentTime + 0.08);
+            }
+        }
+
+        function playApplauseEffect() {
+            if (gameState.audioMuted) return;
+            try {
+                const bufferSize = soundCtx.sampleRate * 0.8;
+                const buffer = soundCtx.createBuffer(1, bufferSize, soundCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = soundCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = soundCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1000;
+
+                const gain = soundCtx.createGain();
+                gain.gain.setValueAtTime(0.25, soundCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, soundCtx.currentTime + 0.8);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(soundCtx.destination);
+
+                noise.start();
+            } catch(e) {}
+        }
+
+        const bmAlphabetNames = {
+            'a': 'a',
+            'b': 'bi',
+            'c': 'si',
+            'd': 'di',
+            'e': 'e',
+            'f': 'ef',
+            'g': 'ji',
+            'h': 'ha',
+            'i': 'i',
+            'j': 'je',
+            'k': 'ka',
+            'l': 'el',
+            'm': 'em',
+            'n': 'en',
+            'o': 'o',
+            'p': 'pe',
+            'q': 'ku',
+            'r': 'ar',
+            's': 'es',
+            't': 'te',
+            'u': 'u',
+            'v': 'vi',
+            'w': 'dabliu',
+            'x': 'eks',
+            'y': 'wai',
+            'z': 'zet'
+        };
+
+        let currentAudio = null;
+        let lockedFemaleVoice = null;
+
+        function getStrictFemaleVoice() {
+            if (!('speechSynthesis' in window)) return null;
+            const voices = window.speechSynthesis.getVoices();
+            if (!voices || voices.length === 0) return null;
+
+            let femaleMalay = voices.find(v => {
+                const lang = (v.lang || '').toLowerCase().replace('_', '-');
+                const name = (v.name || '').toLowerCase();
+                const isMalay = lang === 'ms-my' || lang.startsWith('ms-') || name.includes('malay') || name.includes('malaysia');
+                const isIndonesian = lang.startsWith('id') || name.includes('indonesia');
+                const isMale = name.includes('male') || name.includes('pria') || name.includes('rizwan') || name.includes('guy') || name.includes('david') || name.includes('george') || name.includes('boy');
+                return isMalay && !isIndonesian && !isMale;
+            });
+
+            if (femaleMalay) return femaleMalay;
+
+            let anyFemale = voices.find(v => {
+                const name = (v.name || '').toLowerCase();
+                const isMale = name.includes('male') || name.includes('pria') || name.includes('rizwan') || name.includes('david') || name.includes('boy') || name.includes('guy');
+                return (name.includes('female') || name.includes('wanita') || name.includes('zira') || name.includes('yasmin') || name.includes('siti') || name.includes('google')) && !isMale;
+            });
+
+            return anyFemale || null;
+        }
+
+        // Saluran Audio Terpadu Yang Konsisten Sempurna untuk Semua Modul
+        function speak(text, rate = 0.82) {
+            if (gameState.audioMuted) return;
+
+            let cleanText = text ? text.toString().trim() : '';
+            if (!cleanText) return;
+
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+
+            let textToSpeak = cleanText;
+            if (cleanText.toLowerCase() === 'f' || cleanText.toLowerCase() === 'fa') {
+                textToSpeak = 'ef';
+            } else if (cleanText.length === 1 && bmAlphabetNames[cleanText.toLowerCase()]) {
+                textToSpeak = bmAlphabetNames[cleanText.toLowerCase()];
+            }
+
+            const googleTtsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(textToSpeak)}&tl=ms&client=tw-ob`;
+            
+            const audio = new Audio(googleTtsUrl);
+            audio.playbackRate = rate;
+            currentAudio = audio;
+
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    speakWebSpeechFallback(textToSpeak, rate);
+                });
+            }
+        }
+
+        function speakWebSpeechFallback(text, rate = 0.82) {
+            if (!('speechSynthesis' in window)) return;
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ms-MY';
+            utterance.rate = rate;
+            utterance.pitch = 1.15;
+
+            if (!lockedFemaleVoice) {
+                lockedFemaleVoice = getStrictFemaleVoice();
+            }
+
+            if (lockedFemaleVoice) {
+                utterance.voice = lockedFemaleVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function repeatInstruction() {
+            const instr = document.getElementById('instruction-text').innerText;
+            speak(instr);
+        }
+
+        function toggleGlobalAudio() {
+            gameState.audioMuted = !gameState.audioMuted;
+            const btn = document.getElementById('btn-audio-toggle');
+            if (gameState.audioMuted) {
+                btn.innerHTML = '🔇';
+                btn.classList.replace('bg-boldBlue', 'bg-gray-400');
+                if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            } else {
+                btn.innerHTML = '🔊';
+                btn.classList.replace('bg-gray-400', 'bg-boldBlue');
+                speak("Audio dihidupkan");
+            }
+        }
+
+        function addStarCount(amount = 1) {
+            gameState.stars += amount;
+            document.getElementById('stars-display').innerText = gameState.stars;
+            
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 45,
+                    spread: 65,
+                    origin: { y: 0.7 }
+                });
+            }
+
+            checkMedalStatus();
+        }
+
+        function checkMedalStatus() {
+            const icon = document.getElementById('medal-icon');
+            const label = document.getElementById('medal-label');
+
+            if (gameState.stars >= 20 && gameState.medal !== 'Emas') {
+                gameState.medal = 'Emas';
+                icon.innerText = '🥇';
+                label.innerText = 'Emas';
+                document.getElementById('medal-card-gold').classList.remove('opacity-40');
+                showRewardModal("Pandainya!", "Luar biasa! Anda mendapat Pingat Emas!");
+            } else if (gameState.stars >= 10 && gameState.medal === 'Gangsa') {
+                gameState.medal = 'Perak';
+                icon.innerText = '🥈';
+                label.innerText = 'Perak';
+                document.getElementById('medal-card-silver').classList.remove('opacity-40');
+                showRewardModal("Pandainya!", "Syabas! Anda naik ke Pingat Perak!");
+            }
+        }
+
+        function showRewardModal(title, desc, isCorrect = true) {
+            if (isCorrect) {
+                playSfx('correct');
+                playSfx('applause');
+            } else {
+                playSfx('wrong');
+            }
+
+            document.getElementById('reward-icon').innerText = isCorrect ? '🎉' : '💡';
+            document.getElementById('reward-title').innerText = title;
+            document.getElementById('reward-desc').innerText = desc;
+            document.getElementById('reward-modal').classList.remove('hidden');
+
+            setTimeout(() => {
+                // Memastikan sebutan pujian menggunakan nada mesra disleksia yang sama persis seperti arahan soalan Modul 1
+                speak(`${title} ${desc}`);
+            }, 600);
+        }
+
+        function closeRewardModal() {
+            document.getElementById('reward-modal').classList.add('hidden');
+        }
+
+        function openMedalModal() {
+            document.getElementById('medal-modal').classList.remove('hidden');
+        }
+
+        function closeMedalModal() {
+            document.getElementById('medal-modal').classList.add('hidden');
+        }
+
+        function updateInstructionText(msg) {
+            document.getElementById('instruction-text').innerText = msg;
+            setTimeout(() => speak(msg), 250);
+        }
+
+        function switchModule(modNum) {
+            gameState.currentModule = modNum;
+            const container = document.getElementById('app-viewport');
+            container.innerHTML = '';
+
+            switch(modNum) {
+                case 0: renderMainMenu(container); break;
+                case 1: renderModule1(container); break;
+                case 2: renderModule2(container); break;
+                case 3: renderModule3(container); break;
+                case 4: renderModule4(container); break;
+                case 5: renderModule5(container); break;
+                case 6: renderModule6(container); break;
+                case 7: renderModule7(container); break;
+            }
+        }
+
+        function renderMainMenu(container) {
+            updateInstructionText("Sila pilih mana-mana modul permainan di bawah untuk mula belajar!");
+
+            container.innerHTML = `
+                <div class="text-center py-2">
+                    <div class="inline-block bg-boldRed text-white font-black text-3xl md:text-5xl px-6 py-2.5 rounded-3xl border-4 border-slate-900 shadow-dys-md mb-3">
+                        BaKata+
+                    </div>
+                    <p class="text-xl md:text-2xl font-black text-slate-800 mb-6 max-w-2xl mx-auto">
+                        Peta Permainan Literasi Bahasa Melayu Standard
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-left">
+                        <button onclick="switchModule(1)" class="bg-boldYellow hover:bg-yellow-300 p-4 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia flex items-center gap-3">
+                            <span class="text-4xl">🔤</span>
+                            <div>
+                                <div class="font-black text-lg">Modul 1</div>
+                                <div class="text-sm font-bold text-slate-800">Kenal Huruf A - Z</div>
+                            </div>
+                        </button>
+
+                        <button onclick="switchModule(2)" class="bg-boldBlue hover:bg-sky-400 text-white p-4 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia flex items-center gap-3">
+                            <span class="text-4xl">🔍</span>
+                            <div>
+                                <div class="font-black text-lg">Modul 2</div>
+                                <div class="text-sm font-bold">Huruf Keliru Sasaran</div>
+                            </div>
+                        </button>
+
+                        <button onclick="switchModule(3)" class="bg-boldGreen hover:bg-green-500 text-slate-900 p-4 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia flex items-center gap-3">
+                            <span class="text-4xl">🎯</span>
+                            <div>
+                                <div class="font-black text-lg">Modul 3</div>
+                                <div class="text-sm font-bold">Uji Minda 1: Bunyi Huruf</div>
+                            </div>
+                        </button>
+
+                        <button onclick="switchModule(4)" class="bg-boldOrange hover:bg-amber-500 text-white p-4 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia flex items-center gap-3">
+                            <span class="text-4xl">🧩</span>
+                            <div>
+                                <div class="font-black text-lg">Modul 4</div>
+                                <div class="text-sm font-bold">Gabung & Eja Suku Kata</div>
+                            </div>
+                        </button>
+
+                        <button onclick="switchModule(5)" class="bg-boldPurple hover:bg-purple-500 text-white p-4 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia flex items-center gap-3">
+                            <span class="text-4xl">✍️</span>
+                            <div>
+                                <div class="font-black text-lg">Modul 5</div>
+                                <div class="text-sm font-bold">Uji Minda 2: Susun Suku Kata</div>
+                            </div>
+                        </button>
+
+                        <button onclick="switchModule(6)" class="bg-pink-400 hover:bg-pink-500 text-slate-900 p-4 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia flex items-center gap-3">
+                            <span class="text-4xl">📖</span>
+                            <div>
+                                <div class="font-black text-lg">Modul 6</div>
+                                <div class="text-sm font-bold">Uji Minda 3: Susun Simpulan</div>
+                            </div>
+                        </button>
+
+                        <button onclick="switchModule(7)" class="col-span-1 sm:col-span-2 md:col-span-3 bg-boldRed hover:bg-red-500 text-white p-4 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia flex items-center justify-center gap-4">
+                            <span class="text-4xl">💡</span>
+                            <div class="text-center">
+                                <div class="font-black text-xl">Modul 7</div>
+                                <div class="text-sm font-bold">Kenal & Faham Maksud Simpulan Bahasa</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderModule1(container) {
+            updateInstructionText("Tekan sebarang huruf untuk mendengar sebutan namanya.");
+
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+            const alphabetHTML = alphabet.map(l => `
+                <button onclick="speak('${l}', 0.65); playSfx('click')" 
+                        class="bg-white hover:bg-boldYellow text-slate-900 font-black text-3xl md:text-5xl p-3 md:p-4 rounded-2xl border-3 border-slate-900 shadow-dys-sm btn-dyslexia flex items-center justify-center">
+                    ${l}
+                </button>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-black text-slate-900">Modul 1: Huruf A hingga Z</h2>
+                    <span class="bg-boldYellow px-3 py-1 rounded-xl border-2 border-slate-900 font-bold text-xs md:text-sm">Sentuh Huruf</span>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 gap-2.5 md:gap-3">
+                    ${alphabetHTML}
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="switchModule(2)" class="bg-boldGreen hover:bg-green-500 text-slate-900 font-black text-lg px-6 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                        Ke Modul 2: Huruf Keliru ➡️
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderModule2(container) {
+            updateInstructionText("Perhatikan bentuk dan arah huruf keliru berikut. Tekan butang untuk mendengar sebutan.");
+
+            const cards = targetLetterPairs.map(p => `
+                <div class="bg-amber-50 border-3 border-slate-900 rounded-2xl p-4 shadow-dys-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-around my-2">
+                        <button onclick="speak('${p.l1}', 0.6); playSfx('click')" class="bg-boldBlue text-white font-black text-5xl w-20 h-20 rounded-2xl border-3 border-slate-900 shadow-dys-sm btn-dyslexia flex items-center justify-center">
+                            ${p.l1}
+                        </button>
+                        <span class="text-2xl font-black text-slate-400">VS</span>
+                        <button onclick="speak('${p.l2}', 0.6); playSfx('click')" class="bg-boldRed text-white font-black text-5xl w-20 h-20 rounded-2xl border-3 border-slate-900 shadow-dys-sm btn-dyslexia flex items-center justify-center">
+                            ${p.l2}
+                        </button>
+                    </div>
+                    <div class="text-xs md:text-sm font-bold text-slate-800 mt-2 bg-white p-2.5 rounded-xl border border-slate-900 text-center">
+                        💡 ${p.desc}
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-2xl font-black text-slate-900">Modul 2: Pasangan Huruf Keliru</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[360px] overflow-y-auto p-1">
+                    ${cards}
+                </div>
+                <div class="mt-6 flex justify-between">
+                    <button onclick="switchModule(1)" class="bg-gray-200 text-slate-900 font-extrabold text-lg px-5 py-2.5 rounded-2xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia">
+                        ⬅️ Kembali
+                    </button>
+                    <button onclick="switchModule(3)" class="bg-boldGreen hover:bg-green-500 text-slate-900 font-black text-lg px-6 py-2.5 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                        Mula Uji Minda 1 ➡️
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderModule3(container) {
+            const q = mindTest1Questions[gameState.m3Index];
+            updateInstructionText("Dengar sebutan audio huruf, kemudian pilih bentuk huruf yang betul!");
+
+            const optionsHTML = q.options.map(opt => `
+                <button onclick="verifyM3Answer('${opt}')" class="bg-white hover:bg-boldYellow text-slate-900 font-black text-6xl py-8 rounded-3xl border-4 border-slate-900 shadow-dys-md btn-dyslexia flex items-center justify-center">
+                    ${opt}
+                </button>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-2xl font-black text-slate-900">Modul 3: Uji Minda 1</h2>
+                    <span class="bg-boldPurple text-white px-3 py-1 rounded-xl border-2 border-slate-900 font-bold text-sm">Soalan ${gameState.m3Index + 1} / ${mindTest1Questions.length}</span>
+                </div>
+
+                <div class="text-center my-6">
+                    <button onclick="speak('${q.sound}', 0.55)" class="bg-boldOrange hover:bg-amber-500 text-white font-black text-2xl px-8 py-4 rounded-3xl border-3 border-slate-900 shadow-dys-md btn-dyslexia inline-flex items-center gap-3">
+                        <span class="text-4xl">🔊</span> Mainkan Sebutan Huruf
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 md:gap-6 max-w-xl mx-auto w-full mb-6">
+                    ${optionsHTML}
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <button onclick="switchModule(2)" class="bg-gray-200 text-slate-900 font-bold px-4 py-2 rounded-xl border-2 border-slate-900">
+                        ⬅️ Huruf Keliru
+                    </button>
+                    <span class="font-bold text-sm text-slate-600">Pilih 1 jawapan tepat</span>
+                </div>
+            `;
+        }
+
+        function verifyM3Answer(selected) {
+            const q = mindTest1Questions[gameState.m3Index];
+            if (selected === q.answer) {
+                addStarCount(1);
+                showRewardModal("Pandainya!", "Jawapan anda betul tepat!");
+                
+                if (gameState.m3Index < mindTest1Questions.length - 1) {
+                    gameState.m3Index++;
+                } else {
+                    gameState.m3Index = 0;
+                    setTimeout(() => switchModule(4), 1800);
+                    return;
+                }
+            } else {
+                showRewardModal("Terus Cuba!", "Dengar semula sebutan dan pilih huruf yang betul.", false);
+            }
+            renderModule3(document.getElementById('app-viewport'));
+        }
+
+        function renderModule4(container) {
+            const item = simpulanMasterData[gameState.m4Index];
+            updateInstructionText(`Sebut suku kata dan perkataan untuk "${item.phrase.toUpperCase()}".`);
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-2xl font-black text-slate-900">Modul 4: Eja & Batang Suku Kata</h2>
+                    <span class="bg-boldBlue text-white px-3 py-1 rounded-xl border-2 border-slate-900 font-bold text-sm">Contoh ${gameState.m4Index + 1} / ${simpulanMasterData.length}</span>
+                </div>
+
+                <div class="bg-yellow-100 border-3 border-slate-900 rounded-2xl p-3 mb-4 text-center">
+                    <span class="text-xs font-black text-boldPurple uppercase tracking-wider">${item.pola}</span>
+                    <div class="text-3xl font-black text-boldRed mt-0.5">${item.phrase.toUpperCase()}</div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="bg-white border-3 border-slate-900 rounded-2xl p-3 shadow-dys-sm flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">${item.emoji}</span>
+                            <span class="font-extrabold text-base">Kata 1:</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <button onclick="speak('${item.syllables1[0]}')" class="bg-boldYellow font-black text-2xl px-4 py-2 rounded-xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia">
+                                ${item.syllables1[0]}
+                            </button>
+                            <span class="font-black text-xl">+</span>
+                            <button onclick="speak('${item.syllables1[1]}')" class="bg-boldBlue text-white font-black text-2xl px-4 py-2 rounded-xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia">
+                                ${item.syllables1[1]}
+                            </button>
+                            <span class="font-black text-xl">=</span>
+                            <button onclick="speak('${item.word1}')" class="bg-boldGreen font-black text-2xl px-5 py-2 rounded-xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia">
+                                ${item.word1}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border-3 border-slate-900 rounded-2xl p-3 shadow-dys-sm flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">💖</span>
+                            <span class="font-extrabold text-base">Kata 2:</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <button onclick="speak('${item.syllables2[0]}')" class="bg-boldYellow font-black text-2xl px-4 py-2 rounded-xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia">
+                                ${item.syllables2[0]}
+                            </button>
+                            <span class="font-black text-xl">+</span>
+                            <button onclick="speak('${item.syllables2[1]}')" class="bg-boldBlue text-white font-black text-2xl px-4 py-2 rounded-xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia">
+                                ${item.syllables2[1]}
+                            </button>
+                            <span class="font-black text-xl">=</span>
+                            <button onclick="speak('${item.word2}')" class="bg-boldGreen font-black text-2xl px-5 py-2 rounded-xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia">
+                                ${item.word2}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <button onclick="speak('${item.phrase}')" class="bg-boldRed hover:bg-red-500 text-white font-black text-2xl px-8 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                        🔊 Sebut Penuh: "${item.phrase.toUpperCase()}"
+                    </button>
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <button onclick="prevM4()" class="bg-gray-200 font-bold px-4 py-2 rounded-xl border-2 border-slate-900">
+                        ⬅️ Sebelum
+                    </button>
+                    <button onclick="nextM4()" class="bg-boldGreen hover:bg-green-500 text-slate-900 font-black text-lg px-6 py-2.5 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                        Seterusnya ➡️
+                    </button>
+                </div>
+            `;
+        }
+
+        function prevM4() {
+            if (gameState.m4Index > 0) {
+                gameState.m4Index--;
+                renderModule4(document.getElementById('app-viewport'));
+            }
+        }
+
+        function nextM4() {
+            if (gameState.m4Index < simpulanMasterData.length - 1) {
+                gameState.m4Index++;
+                renderModule4(document.getElementById('app-viewport'));
+            } else {
+                switchModule(5);
+            }
+        }
+
+        let m5Selection = [];
+
+        function renderModule5(container) {
+            const item = simpulanMasterData[gameState.m5Index];
+            const targetWord = item.word1;
+            
+            updateInstructionText("Pilih dan susun suku kata yang betul untuk membina perkataan!");
+
+            let pool = [item.syllables1[0], item.syllables1[1], 'ka', 'ti', 'bu', 'ma'].sort(() => 0.5 - Math.random());
+            pool = [...new Set(pool)].slice(0, 5);
+            if (!pool.includes(item.syllables1[0])) pool[0] = item.syllables1[0];
+            if (!pool.includes(item.syllables1[1])) pool[1] = item.syllables1[1];
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-2xl font-black text-slate-900">Modul 5: Uji Minda 2</h2>
+                    <span class="bg-boldPurple text-white px-3 py-1 rounded-xl border-2 border-slate-900 font-bold text-sm">Latihan ${gameState.m5Index + 1} / ${simpulanMasterData.length}</span>
+                </div>
+
+                <div class="text-center my-2">
+                    <div class="text-6xl mb-2">${item.emoji}</div>
+                    <button onclick="speak('${targetWord}')" class="bg-boldOrange text-white font-black text-xl px-5 py-2 rounded-2xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia inline-flex items-center gap-2">
+                        🔊 Dengar Kata: "${targetWord}"
+                    </button>
+                </div>
+
+                <div class="bg-gray-100 border-3 border-dashed border-slate-900 rounded-3xl p-4 my-4 flex items-center justify-center gap-3 min-h-[90px]">
+                    ${m5Selection.map((s, idx) => `
+                        <button onclick="removeM5Syllable(${idx})" class="bg-boldBlue text-white font-black text-3xl px-6 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                            ${s} ❌
+                        </button>
+                    `).join('')}
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center gap-3 my-4">
+                    ${pool.map(s => `
+                        <button onclick="addM5Syllable('${s}')" class="bg-boldYellow hover:bg-amber-300 font-black text-3xl px-6 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                            ${s}
+                        </button>
+                    `).join('')}
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <button onclick="resetM5()" class="bg-gray-200 text-slate-900 font-bold px-4 py-2 rounded-xl border-2 border-slate-900">
+                        🔄 Semula
+                    </button>
+                    <button onclick="verifyM5Answer()" class="bg-boldGreen hover:bg-green-500 text-slate-900 font-black text-xl px-8 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                        Semak Jawapan ✔
+                    </button>
+                </div>
+            `;
+        }
+
+        function addM5Syllable(s) {
+            speak(s);
+            if (m5Selection.length < 2) {
+                m5Selection.push(s);
+                renderModule5(document.getElementById('app-viewport'));
+            }
+        }
+
+        function removeM5Syllable(idx) {
+            m5Selection.splice(idx, 1);
+            renderModule5(document.getElementById('app-viewport'));
+        }
+
+        function resetM5() {
+            m5Selection = [];
+            renderModule5(document.getElementById('app-viewport'));
+        }
+
+        function verifyM5Answer() {
+            const item = simpulanMasterData[gameState.m5Index];
+            const formed = m5Selection.join('');
+
+            if (formed === item.word1) {
+                addStarCount(1);
+                showRewardModal("Pandainya!", `Suku kata membentuk perkataan "${item.word1.toUpperCase()}".`);
+                m5Selection = [];
+                if (gameState.m5Index < simpulanMasterData.length - 1) {
+                    gameState.m5Index++;
+                } else {
+                    gameState.m5Index = 0;
+                    setTimeout(() => switchModule(6), 1800);
+                    return;
+                }
+            } else {
+                showRewardModal("Terus Cuba!", "Susunan suku kata belum tepat. Sila cuba lagi!", false);
+            }
+            renderModule5(document.getElementById('app-viewport'));
+        }
+
+        let m6Selection = [];
+
+        function renderModule6(container) {
+            const item = simpulanMasterData[gameState.m6Index];
+            updateInstructionText(`Susun dua perkataan untuk membina Simpulan Bahasa "${item.phrase.toUpperCase()}".`);
+
+            let wordChoices = [item.word1, item.word2, 'kopi', 'mata'].sort(() => 0.5 - Math.random());
+            wordChoices = [...new Set(wordChoices)].slice(0, 3);
+            if (!wordChoices.includes(item.word1)) wordChoices[0] = item.word1;
+            if (!wordChoices.includes(item.word2)) wordChoices[1] = item.word2;
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-2xl font-black text-slate-900">Modul 6: Uji Minda 3</h2>
+                    <span class="bg-boldRed text-white px-3 py-1 rounded-xl border-2 border-slate-900 font-bold text-sm">Peringkat ${gameState.m6Index + 1} / ${simpulanMasterData.length}</span>
+                </div>
+
+                <div class="text-center my-3">
+                    <div class="text-6xl mb-2">${item.emoji}</div>
+                    <button onclick="speak('${item.phrase}')" class="bg-boldOrange text-white font-black text-xl px-6 py-2 rounded-2xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia inline-flex items-center gap-2">
+                        🔊 Dengar Simpulan Bahasa
+                    </button>
+                </div>
+
+                <div class="bg-amber-50 border-3 border-dashed border-slate-900 rounded-3xl p-4 my-4 flex items-center justify-center gap-3 min-h-[90px]">
+                    ${m6Selection.map((w, idx) => `
+                        <button onclick="removeM6Word(${idx})" class="bg-boldRed text-white font-black text-2xl md:text-3xl px-6 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                            ${w} ❌
+                        </button>
+                    `).join('')}
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center gap-4 my-4">
+                    ${wordChoices.map(w => `
+                        <button onclick="addM6Word('${w}')" class="bg-boldGreen hover:bg-green-400 font-black text-2xl md:text-3xl px-6 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                            ${w}
+                        </button>
+                    `).join('')}
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <button onclick="resetM6()" class="bg-gray-200 text-slate-900 font-bold px-4 py-2 rounded-xl border-2 border-slate-900">
+                        🔄 Semula
+                    </button>
+                    <button onclick="verifyM6Answer()" class="bg-boldGreen hover:bg-green-500 text-slate-900 font-black text-xl px-8 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                        Semak Jawapan ✔️
+                    </button>
+                </div>
+            `;
+        }
+
+        function addM6Word(w) {
+            speak(w);
+            if (m6Selection.length < 2) {
+                m6Selection.push(w);
+                renderModule6(document.getElementById('app-viewport'));
+            }
+        }
+
+        function removeM6Word(idx) {
+            m6Selection.splice(idx, 1);
+            renderModule6(document.getElementById('app-viewport'));
+        }
+
+        function resetM6() {
+            m6Selection = [];
+            renderModule6(document.getElementById('app-viewport'));
+        }
+
+        function verifyM6Answer() {
+            const item = simpulanMasterData[gameState.m6Index];
+            const formed = m6Selection.join(' ');
+
+            if (formed === item.phrase) {
+                addStarCount(2);
+                showRewardModal("Pandainya!", `Terbinanya simpulan bahasa "${item.phrase.toUpperCase()}".`);
+                m6Selection = [];
+                if (gameState.m6Index < simpulanMasterData.length - 1) {
+                    gameState.m6Index++;
+                } else {
+                    gameState.m6Index = 0;
+                    setTimeout(() => switchModule(7), 1800);
+                    return;
+                }
+            } else {
+                showRewardModal("Terus Cuba!", "Susunan perkataan belum membentuk simpulan bahasa yang betul.", false);
+            }
+            renderModule6(document.getElementById('app-viewport'));
+        }
+
+        function renderModule7(container) {
+            const item = simpulanMasterData[gameState.m7Index];
+            updateInstructionText(`Pelajari maksud simpulan bahasa "${item.phrase.toUpperCase()}" dan contoh penggunaannya.`);
+
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-2xl font-black text-slate-900">Modul 7: Faham Maksud</h2>
+                    <span class="bg-boldPurple text-white px-3 py-1 rounded-xl border-2 border-slate-900 font-bold text-sm">Kad ${gameState.m7Index + 1} / ${simpulanMasterData.length}</span>
+                </div>
+
+                <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 shadow-dys-md my-2 text-center relative overflow-hidden">
+                    <div class="text-7xl mb-3">${item.emoji}</div>
+                    
+                    <button onclick="speak('${item.phrase}')" class="bg-boldRed hover:bg-red-500 text-white font-black text-3xl px-8 py-3 rounded-2xl border-3 border-slate-900 shadow-dys-sm btn-dyslexia mb-4">
+                        🔊 ${item.phrase.toUpperCase()}
+                    </button>
+
+                    <div class="bg-amber-100 border-2 border-slate-900 rounded-2xl p-4 my-3 text-left">
+                        <div class="font-black text-boldPurple text-sm uppercase">Maksud:</div>
+                        <p class="text-xl font-black text-slate-900 mt-1">${item.meaning}</p>
+                    </div>
+
+                    <div class="bg-blue-50 border-2 border-slate-900 rounded-2xl p-4 text-left">
+                        <div class="font-black text-boldBlue text-sm uppercase">Contoh Ayat:</div>
+                        <p class="text-lg font-extrabold text-slate-800 mt-1">"${item.example}"</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex justify-between items-center">
+                    <button onclick="prevM7()" class="bg-gray-200 font-bold px-4 py-2 rounded-xl border-2 border-slate-900">
+                        ⬅️ Sebelum
+                    </button>
+                    <button onclick="speak('${item.phrase}. Maksudnya: ${item.meaning}. Contoh ayat: ${item.example}')" class="bg-boldYellow hover:bg-amber-300 font-black text-lg px-5 py-2.5 rounded-2xl border-2 border-slate-900 shadow-dys-sm btn-dyslexia">
+                        🔊 Dengar Penerangan
+                    </button>
+                    <button onclick="nextM7()" class="bg-boldGreen hover:bg-green-500 text-slate-900 font-black text-lg px-6 py-2.5 rounded-2xl border-3 border-slate-900 shadow-dys-md btn-dyslexia">
+                        Seterusnya ➡️
+                    </button>
+                </div>
+            `;
+        }
+
+        function prevM7() {
+            if (gameState.m7Index > 0) {
+                gameState.m7Index--;
+                renderModule7(document.getElementById('app-viewport'));
+            }
+        }
+
+        function nextM7() {
+            if (gameState.m7Index < simpulanMasterData.length - 1) {
+                gameState.m7Index++;
+                renderModule7(document.getElementById('app-viewport'));
+            } else {
+                showRewardModal("Pandainya!", "Tahniah! Anda telah berjaya melengkapkan kesemua modul BaKata+!");
+                setTimeout(() => switchModule(0), 2200);
+            }
+        }
+
+        window.onload = function() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.onvoiceschanged = function() {
+                    getStrictFemaleVoice();
+                };
+            }
+            switchModule(0);
+        };
+    </script>
+</body>
+</html>
