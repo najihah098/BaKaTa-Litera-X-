@@ -495,24 +495,34 @@
             const voices = window.speechSynthesis.getVoices();
             if (!voices || voices.length === 0) return null;
 
-            let femaleMalay = voices.find(v => {
-                const lang = (v.lang || '').toLowerCase().replace('_', '-');
-                const name = (v.name || '').toLowerCase();
-                const isMalay = lang === 'ms-my' || lang.startsWith('ms-') || name.includes('malay') || name.includes('malaysia');
-                const isIndonesian = lang.startsWith('id') || name.includes('indonesia');
-                const isMale = name.includes('male') || name.includes('pria') || name.includes('rizwan') || name.includes('guy') || name.includes('david') || name.includes('george') || name.includes('boy');
-                return isMalay && !isIndonesian && !isMale;
-            });
+let femaleMalay = voices.find(v => {
+    const lang = (v.lang || '').toLowerCase().replace('_', '-');
+    const name = (v.name || '').toLowerCase();
 
-            if (femaleMalay) return femaleMalay;
+    const isMalayMalaysia =
+        lang === 'ms-my' ||
+        name.includes('malay malaysia') ||
+        name.includes('malaysia');
 
-            let anyFemale = voices.find(v => {
-                const name = (v.name || '').toLowerCase();
-                const isMale = name.includes('male') || name.includes('pria') || name.includes('rizwan') || name.includes('david') || name.includes('boy') || name.includes('guy');
-                return (name.includes('female') || name.includes('wanita') || name.includes('zira') || name.includes('yasmin') || name.includes('siti') || name.includes('google')) && !isMale;
-            });
+    const isIndonesian =
+        lang.startsWith('id') ||
+        name.includes('indonesia');
 
-            return anyFemale || null;
+    const isMale =
+        name.includes('male') ||
+        name.includes('pria') ||
+        name.includes('rizwan') ||
+        name.includes('guy') ||
+        name.includes('david') ||
+        name.includes('george') ||
+        name.includes('boy');
+
+    return isMalayMalaysia && !isIndonesian && !isMale;
+});
+
+if (femaleMalay) return femaleMalay;
+
+return null;
         }
 
         // Saluran Audio Terpadu Yang Konsisten Sempurna untuk Semua Modul
